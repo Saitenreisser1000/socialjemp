@@ -18,7 +18,12 @@
               hide-details
             ></v-text-field>
           </v-card-title>
-          <v-data-table :headers="headers" :items="getAllSongs" :search="search"></v-data-table>
+          <v-data-table
+            :headers="headers"
+            :items="getAllSongs"
+            :search="search"
+            @click:row="setActiveSong"
+          ></v-data-table>
         </v-tab-item>
       </v-tabs-items>
     </v-card>
@@ -26,7 +31,7 @@
 </template>
 
 <script>
-import { songStore } from "../Store/songStore";
+import { songStore } from "../stores/songStore";
 import { mapGetters, mapActions, mapMutations } from "vuex";
 
 export default {

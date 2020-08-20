@@ -10,7 +10,7 @@ export const songStore = {
 
         },
         activeSong(state, song) {
-            state.activeSong = state.allSongs[0];
+            state.activeSong = song;
         }
     },
 
@@ -27,7 +27,7 @@ export const songStore = {
     },
 
     getters: {
-        getActiveSong: (state) => { return state.allSongs[0] },
+        getActiveSong: (state) => { return state.activeSong },
         getAllSongs: (state) => { return state.allSongs }
     }
 };

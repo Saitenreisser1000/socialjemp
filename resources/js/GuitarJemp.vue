@@ -1,7 +1,7 @@
 <template>
   <div>
     <fretboard></fretboard>
-    <player :jempSong="getActiveSong"></player>
+    <player></player>
     <songlist></songlist>
   </div>
 </template>

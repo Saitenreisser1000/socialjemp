@@ -47,7 +47,6 @@ import * as Tone from "tone";
 import { mapGetters } from "vuex";
 
 export default {
-  props: ["jempSong"],
   data() {
     return {
       transport: Tone.Transport,
@@ -57,9 +56,10 @@ export default {
       endSongTime: "",
       speed: 60,
       volume: -100,
-      isScheduled: false,
       transPos: "0",
       transMulti: 100,
+
+      activeSong: "",
 
       dottsInSong: [],
 
@@ -83,20 +83,20 @@ export default {
         this.reset();
       },
     },
-
     volume: function () {
       this.sampler.volume.value = this.volume;
     },
-
-    jempSong: function () {},
+    jempSong: function () {
+      this.scheduleSong(this.jempSong);
+    },
   },
 
   computed: {
-    ...mapGetters(["getAllJemps"]),
+    ...mapGetters({ allJemps: "getAllJemps", jempSong: "getActiveSong" }),
   },
 
   methods: {
-    /************* animationloop ***************/
+    /************* Transport System ***************/
     performAnimation() {
       this.animationRequest = requestAnimationFrame(this.performAnimation);
       if (this.transPos > this.endSongTime * this.transMulti) {
@@ -110,7 +110,7 @@ export default {
     change(transPos) {
       //iterate over jempSong.songdata to find dots that should be removed regarding higher timeschedule
       Tone.Transport.seconds = (transPos / this.transMulti) * (60 / this.speed);
-      for (let dot of this.jempSong.songdata) {
+      for (let dot of this.activeSong) {
         if (dot.time > Tone.Transport.seconds) {
           let higherDot = (this.dottsInSong.find(
             (d) => d.jt_ID === dot.dotID
@@ -127,13 +127,13 @@ export default {
       this.play();
     },
 
+    /******************Scheduling******************/
+
     scheduleSong(jempSong) {
-      this.isScheduled = true;
+      Tone.Transport.cancel();
 
-      let jempTones = jempSong.songdata;
-      jempTones = JSON.parse(jempTones);
-      jempSong.songdata = jempTones;
-
+      let jempTones = JSON.parse(jempSong.songdata);
+      this.activeSong = jempTones;
       this.endSongTime = this.getLastTone(jempTones).time + 2;
 
       for (let jempTone of jempTones) {
@@ -142,7 +142,7 @@ export default {
         }
         Tone.Transport.schedule(() => {
           //activate dot
-          let jemp = this.getAllJemps.find(
+          let jemp = this.allJemps.find(
             (jemp) => jemp.jt_ID === jempTone.dotID
           );
           jemp.isActive = true;
@@ -165,9 +165,7 @@ export default {
       return lastTone;
     },
 
-    reachedEnd() {},
-
-    /****************player ****************/
+    /****************Player ****************/
 
     playToggle(time) {
       if (
@@ -183,9 +181,6 @@ export default {
     },
 
     play() {
-      if (!this.isScheduled) {
-        this.scheduleSong(this.jempSong);
-      }
       Tone.start();
       Tone.Transport.start();
       requestAnimationFrame(this.performAnimation);
@@ -201,6 +196,7 @@ export default {
       Tone.Transport.stop();
       cancelAnimationFrame(this.animationRequest);
       this.transPos = 0;
+      this.change(this.transPos);
     },
   },
 };
