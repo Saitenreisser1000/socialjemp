@@ -11,7 +11,7 @@ window.Vue = require('vue');
 import '@mdi/font/css/materialdesignicons.css'
 import VueRouter from 'vue-router'
 import { routes } from './routes';
-import { store } from './Store/store';
+import { store } from './stores/store';
 import Vuetify from 'vuetify'
 
 Vue.use(Vuetify)
@@ -29,11 +29,8 @@ Vue.use(VueRouter)
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('songlist-component', require('./components/SongList.vue').default);
-Vue.component('fretboard-component', require('./components/Fretboard/Fretboard.vue').default);
-Vue.component('sidebar-component', require('./components/Sidebar.vue').default);
-Vue.component('player-component', require('./components/Player.vue').default);
-Vue.component('guitarjemp-component', require('./components/guitarJemp.vue').default);
+//Vue.component('guitarjemp-component', require('./components/GuitarJemp.vue').default);
+Vue.component('guitarjemp-component', require('./GuitarJemp.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

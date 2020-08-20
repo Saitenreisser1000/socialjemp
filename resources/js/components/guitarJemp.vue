@@ -1,14 +1,20 @@
 <template>
   <div>
-    <fretboard-component></fretboard-component>
-    <player-component :jempSong="getActiveSong"></player-component>
-    <songlist-component></songlist-component>
+    <fretboard></fretboard>
+    <player :jempSong="getActiveSong"></player>
+    <songlist></songlist>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+
+import fretboard from "./Fretboard/TheFretboard.vue";
+import songlist from "./SongList.vue";
+import player from "./Player.vue";
+
 export default {
+  components: { fretboard, songlist, player },
   data() {
     return {};
   },

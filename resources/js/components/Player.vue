@@ -3,18 +3,17 @@
     <div id="playerCard" class="card" style="width: 100%; height: 80px">
       <button @click="playToggle" class="btn btn-primary m-2">{{ playButton }}</button>
       <button @click="reset" class="btn btn-primary m-2">reset</button>
-
       <input
         class="transportFader"
         type="range"
         :min="0"
         :max="endSongTime * this.transMulti"
         value="transPos"
+        @input="change(transPos)"
         @mousedown="onMouseDown()"
         @mouseup="onMouseUp(transPos)"
         v-model="transPos"
       />
-
       <div>
         <form>
           <input
@@ -45,6 +44,7 @@
 
 <script>
 import * as Tone from "tone";
+import { mapGetters } from "vuex";
 
 export default {
   props: ["jempSong"],
@@ -60,6 +60,8 @@ export default {
       isScheduled: false,
       transPos: "0",
       transMulti: 100,
+
+      dottsInSong: [],
 
       sampler: new Tone.Sampler({
         urls: {
@@ -81,11 +83,16 @@ export default {
         this.reset();
       },
     },
+
     volume: function () {
       this.sampler.volume.value = this.volume;
     },
 
     jempSong: function () {},
+  },
+
+  computed: {
+    ...mapGetters(["getAllJemps"]),
   },
 
   methods: {
@@ -100,20 +107,32 @@ export default {
         Tone.Transport.seconds * this.transMulti * (this.speed / 60);
     },
 
+    change(transPos) {
+      //iterate over jempSong.songdata to find dots that should be removed regarding higher timeschedule
+      Tone.Transport.seconds = (transPos / this.transMulti) * (60 / this.speed);
+      for (let dot of this.jempSong.songdata) {
+        if (dot.time > Tone.Transport.seconds) {
+          let higherDot = (this.dottsInSong.find(
+            (d) => d.jt_ID === dot.dotID
+          ).isActive = false);
+        }
+      }
+    },
+
     onMouseDown() {
       this.pause();
     },
 
     onMouseUp(transPos) {
-      Tone.Transport.seconds = (transPos / this.transMulti) * (60 / this.speed);
       this.play();
     },
 
     scheduleSong(jempSong) {
       this.isScheduled = true;
-      //jempsong = {name: song-name, jempTones: [{ tone: "D3", time: 1, color: "red" }]};
+
       let jempTones = jempSong.songdata;
       jempTones = JSON.parse(jempTones);
+      jempSong.songdata = jempTones;
 
       this.endSongTime = this.getLastTone(jempTones).time + 2;
 
@@ -122,6 +141,13 @@ export default {
           throw 'jempTone-format error: tone-, time- and color-values are needed { tone: "D3", time: 1 }';
         }
         Tone.Transport.schedule(() => {
+          //activate dot
+          let jemp = this.getAllJemps.find(
+            (jemp) => jemp.jt_ID === jempTone.dotID
+          );
+          jemp.isActive = true;
+          this.dottsInSong.push(jemp);
+          //play sound
           this.sampler.triggerAttack(jempTone.tone);
         }, jempTone.time);
       }
