@@ -11,6 +11,8 @@ export const songStore = {
         },
         activeSong(state, song) {
             state.activeSong = song;
+            state.activeSong.songdata = JSON.parse(state.activeSong.songdata);
+
         }
     },
 

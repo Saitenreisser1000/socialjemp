@@ -53,6 +53,7 @@ export default {
       animationRequest: "",
 
       playButton: "play",
+      endSongOffset: 2,
       endSongTime: "",
       speed: 60,
       volume: -100,
@@ -118,11 +119,19 @@ export default {
     change(transPos) {
       //iterate over jempSong.songdata to find dots that should be removed regarding higher timeschedule
       Tone.Transport.seconds = (transPos / this.transMulti) * (60 / this.speed);
-      for (let dot of this.activeSong) {
+
+      for (let dot of this.activeSong.songdata) {
+        //remove dots when fader is dragged to left
         if (dot.time > Tone.Transport.seconds) {
           let higherDot = (this.dottsInSong.find(
             (d) => d.jt_ID === dot.dotID
           ).isActive = false);
+        }
+        //set dots when fader is dragged to right
+        if (dot.time < Tone.Transport.seconds) {
+          let lowerDot = (this.dottsInSong.find(
+            (d) => d.jt_ID === dot.dotID
+          ).isActive = true);
         }
       }
     },
@@ -134,23 +143,26 @@ export default {
     /******************Scheduling******************/
 
     scheduleSong(jempSong) {
+      //prepare song for scheduler
+      this.activeSong = jempSong; //declare as active song
+      this.endSongTime =
+        this.getLastTone(jempSong.songdata).time + this.endSongOffset; //define songendtime
+
+      //find and store all needed dotts to activate them when played
+      for (let jempTone of jempSong.songdata) {
+        let dot = this.allJemps.find((dot) => dot.jt_ID === jempTone.dotID);
+        this.dottsInSong.push(dot);
+      }
+
+      //scheduling
       Tone.Transport.cancel();
-
-      let jempTones = JSON.parse(jempSong.songdata);
-      this.activeSong = jempTones;
-      this.endSongTime = this.getLastTone(jempTones).time + 2;
-
-      for (let jempTone of jempTones) {
-        if (jempTone.time === undefined) {
-          throw "jempTone-format error";
-        }
+      for (let jempTone of jempSong.songdata) {
         Tone.Transport.schedule(() => {
           //activate dot
-          let jemp = this.allJemps.find(
-            (jemp) => jemp.jt_ID === jempTone.dotID
+          let dot = this.dottsInSong.find(
+            (dot) => dot.jt_ID === jempTone.dotID
           );
-          jemp.isActive = true;
-          this.dottsInSong.push(jemp);
+          dot.isActive = true;
           //play sound
           let t = this.getTones[jempTone.string - 1][jempTone.fret];
           this.sampler.triggerAttackRelease(t.tone, 0.6);

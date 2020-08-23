@@ -1,6 +1,8 @@
 <template>
   <div class="container">
     <v-card class="mx-auto" elevation="2">
+      <form class="m-4">active song: {{selectedSong.name}}</form>
+      <br />
       <v-tabs v-model="tab" background-color="grey lighten-2" grow color="black">
         <v-tab v-for="item in items" :key="item.tab">{{ item.tab }}</v-tab>
       </v-tabs>
@@ -40,6 +42,7 @@ export default {
   data() {
     return {
       tab: null,
+      selectedSong: "",
       items: [
         { tab: "Pentatonics", content: "Tab 1 Content" },
         { tab: "Scales", content: "Tab 2 Content" },
@@ -77,6 +80,7 @@ export default {
     },
     setActiveSong(song, row) {
       row.select(true);
+      this.selectedSong = song;
       this.activeSong(song);
     },
     doit() {
