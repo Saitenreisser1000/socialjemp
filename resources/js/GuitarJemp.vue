@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 import fretboard from "./components/Fretboard/TheFretboard.vue";
 import songlist from "./components/SongList.vue";

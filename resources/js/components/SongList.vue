@@ -23,6 +23,7 @@
             :items="getAllSongs"
             :search="search"
             @click:row="setActiveSong"
+            single-select
           ></v-data-table>
         </v-tab-item>
       </v-tabs-items>
@@ -74,8 +75,12 @@ export default {
     fetch() {
       this.fetchSongs();
     },
-    setActiveSong(song) {
+    setActiveSong(song, row) {
+      row.select(true);
       this.activeSong(song);
+    },
+    doit() {
+      console.log("doit");
     },
   },
 };
@@ -84,5 +89,10 @@ export default {
 <style>
 a:hover {
   background-color: darkgrey;
+}
+
+tr.v-data-table__selected {
+  background: #0275d8 !important;
+  color: white;
 }
 </style>

@@ -15,7 +15,6 @@ import { store } from './stores/store';
 import Vuetify from 'vuetify'
 
 Vue.use(Vuetify)
-
 Vue.use(VueRouter)
 
 /**
@@ -29,7 +28,6 @@ Vue.use(VueRouter)
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-//Vue.component('guitarjemp-component', require('./components/GuitarJemp.vue').default);
 Vue.component('guitarjemp-component', require('./GuitarJemp.vue').default);
 
 /**

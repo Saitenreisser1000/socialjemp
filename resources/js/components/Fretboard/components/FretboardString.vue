@@ -29,10 +29,11 @@ export default {
 
   created() {
     this.initJemps(this.$vnode.key);
+    this.initTuning();
   },
 
   methods: {
-    ...mapActions(["playTone", "initJemps"]),
+    ...mapActions(["playTone", "initJemps", "initTuning"]),
 
     playSound: function (dotInfo) {
       this.playTone(dotInfo);

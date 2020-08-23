@@ -53,7 +53,6 @@ import FbMarkerPoint from "./components/FretboardMarkerPoint";
 import { mapGetters } from "vuex";
 
 export default {
-  props: ["activeSong"],
   name: "Fretboard",
   computed: {
     ...mapGetters([

@@ -92,7 +92,11 @@ export default {
   },
 
   computed: {
-    ...mapGetters({ allJemps: "getAllJemps", jempSong: "getActiveSong" }),
+    ...mapGetters({
+      allJemps: "getAllJemps",
+      jempSong: "getActiveSong",
+      getTones: "getTones",
+    }),
   },
 
   methods: {
@@ -107,6 +111,10 @@ export default {
         Tone.Transport.seconds * this.transMulti * (this.speed / 60);
     },
 
+    onMouseDown() {
+      this.pause();
+    },
+
     change(transPos) {
       //iterate over jempSong.songdata to find dots that should be removed regarding higher timeschedule
       Tone.Transport.seconds = (transPos / this.transMulti) * (60 / this.speed);
@@ -117,10 +125,6 @@ export default {
           ).isActive = false);
         }
       }
-    },
-
-    onMouseDown() {
-      this.pause();
     },
 
     onMouseUp(transPos) {
@@ -137,8 +141,8 @@ export default {
       this.endSongTime = this.getLastTone(jempTones).time + 2;
 
       for (let jempTone of jempTones) {
-        if (jempTone.time === undefined || !jempTone.tone === undefined) {
-          throw 'jempTone-format error: tone-, time- and color-values are needed { tone: "D3", time: 1 }';
+        if (jempTone.time === undefined) {
+          throw "jempTone-format error";
         }
         Tone.Transport.schedule(() => {
           //activate dot
@@ -148,7 +152,8 @@ export default {
           jemp.isActive = true;
           this.dottsInSong.push(jemp);
           //play sound
-          this.sampler.triggerAttack(jempTone.tone);
+          let t = this.getTones[jempTone.string - 1][jempTone.fret];
+          this.sampler.triggerAttackRelease(t.tone, 0.6);
         }, jempTone.time);
       }
     },
