@@ -93,5 +93,6 @@
 body{
   background-image: url("./pics/background.png");
   background-repeat: repeat;
+  background-attachment: fixed;
 }
 </style>

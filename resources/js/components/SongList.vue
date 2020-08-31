@@ -34,7 +34,6 @@
 </template>
 
 <script>
-import { songStore } from "../stores/songStore";
 import { mapGetters, mapActions, mapMutations } from "vuex";
 
 export default {
@@ -82,9 +81,6 @@ export default {
       row.select(true);
       this.selectedSong = song;
       this.activeSong(song);
-    },
-    doit() {
-      console.log("doit");
     },
   },
 };

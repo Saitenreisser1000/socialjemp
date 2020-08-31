@@ -2,9 +2,9 @@
   <v-hover v-slot:default="{ hover }">
     <v-card
       class="dot"
-      :style="{'backgroundColor':'#CD5C5C', 'borderRadius':'50%' }"
+      :style="{'backgroundColor': dotInfo.color, 'borderRadius':'50%' }"
       :elevation="hover ? 20 : 4"
-      :class="{'dotClicked': dotInfo.isActive, 'isFocused': dotInfo.isFocused}"
+      :class="{'dotActive': dotInfo.isActive, 'isFocused': dotInfo.isFocused}"
       @click="onClick"
     ></v-card>
   </v-hover>
@@ -60,12 +60,19 @@ export default {
   width: 30px;
   background-color: #cd5c5c;
   border-radius: 50%;
+  transition: 0.15s ease-in-out;
+  -moz-transition: 0.15s ease-in-out;
+  -webkit-transition: 0.15s ease-in-out;
 }
+
+.dotDim {
+}
+
 .dot:hover {
   opacity: 0.6;
 }
-.dotClicked {
-  opacity: 1 !important;
+.dotActive {
+  opacity: 1;
 }
 .isFocused {
   background-color: brown;

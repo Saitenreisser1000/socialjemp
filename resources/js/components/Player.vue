@@ -7,7 +7,7 @@
         class="transportFader"
         type="range"
         :min="0"
-        :max="endSongTime * this.transMulti"
+        :max="(this.endSongTime * transMulti)"
         value="transPos"
         @input="change(transPos)"
         @mousedown="onMouseDown()"
@@ -35,7 +35,7 @@
             max="0"
             v-model="volume"
           />
-          <span class="label">volume:{{ volume}}</span>
+          <span class="label">volume:{{ parseInt(volume) + parseInt(50)}}</span>
         </form>
       </div>
     </div>
@@ -51,17 +51,14 @@ export default {
     return {
       transport: Tone.Transport,
       animationRequest: "",
-
       playButton: "play",
       endSongOffset: 2,
-      endSongTime: "",
+      endSongTime: 0,
       speed: 60,
-      volume: -100,
-      transPos: "0",
+      volume: -20,
+      transPos: 0,
       transMulti: 100,
-
       activeSong: "",
-
       dottsInSong: [],
 
       sampler: new Tone.Sampler({
@@ -81,14 +78,19 @@ export default {
       immediate: true,
       handler() {
         Tone.Transport.bpm.value = this.speed;
-        this.reset();
+        this.setSongEndTime();
       },
     },
-    volume: function () {
-      this.sampler.volume.value = this.volume;
+    volume: {
+      immediate: true,
+      handler() {
+        this.sampler.volume.value = this.volume;
+      },
     },
     jempSong: function () {
       this.scheduleSong(this.jempSong);
+      this.dottsInSong.forEach((dots) => (dots.isActive = false));
+      this.reset();
     },
   },
 
@@ -108,8 +110,7 @@ export default {
         Tone.Transport.position = 0;
         this.pause();
       }
-      this.transPos =
-        Tone.Transport.seconds * this.transMulti * (this.speed / 60);
+      this.transPos = Tone.Transport.seconds * this.transMulti;
     },
 
     onMouseDown() {
@@ -118,67 +119,81 @@ export default {
 
     change(transPos) {
       //iterate over jempSong.songdata to find dots that should be removed regarding higher timeschedule
-      Tone.Transport.seconds = (transPos / this.transMulti) * (60 / this.speed);
+      Tone.Transport.seconds = transPos / this.transMulti;
 
-      for (let dot of this.activeSong.songdata) {
-        //remove dots when fader is dragged to left
-        if (dot.time > Tone.Transport.seconds) {
+      //remove dots when fader is dragged towards left
+      this.activeSong.songdata.forEach((dot) => {
+        if (Tone.Transport.toSeconds(dot.time) > Tone.Transport.seconds) {
           let higherDot = (this.dottsInSong.find(
             (d) => d.jt_ID === dot.dotID
           ).isActive = false);
         }
-        //set dots when fader is dragged to right
-        if (dot.time < Tone.Transport.seconds) {
+        //set dots when fader is dragged towards right
+        if (Tone.Transport.toSeconds(dot.time) < Tone.Transport.seconds) {
           let lowerDot = (this.dottsInSong.find(
             (d) => d.jt_ID === dot.dotID
           ).isActive = true);
         }
-      }
+      });
     },
-
     onMouseUp(transPos) {
       this.play();
     },
 
     /******************Scheduling******************/
 
-    scheduleSong(jempSong) {
+    scheduleSong(activeSong) {
+      //extract dot position from dot_ID ("5|3") => string = 5, fret = 3
+      activeSong.songdata.forEach((dot) => {
+        dot.string = dot.dotID.match(/[^\|]*/)[0];
+        dot.fret = dot.dotID.match(/[^|]*$/)[0];
+      });
       //prepare song for scheduler
-      this.activeSong = jempSong; //declare as active song
-      this.endSongTime =
-        this.getLastTone(jempSong.songdata).time + this.endSongOffset; //define songendtime
-
+      this.activeSong = activeSong;
+      this.setSongEndTime();
       //find and store all needed dotts to activate them when played
-      for (let jempTone of jempSong.songdata) {
+      this.activeSong.songdata.forEach((jempTone) => {
         let dot = this.allJemps.find((dot) => dot.jt_ID === jempTone.dotID);
         this.dottsInSong.push(dot);
-      }
+      });
 
       //scheduling
       Tone.Transport.cancel();
-      for (let jempTone of jempSong.songdata) {
+      this.activeSong.songdata.forEach((jempTone) => {
         Tone.Transport.schedule(() => {
           //activate dot
           let dot = this.dottsInSong.find(
             (dot) => dot.jt_ID === jempTone.dotID
           );
           dot.isActive = true;
+
+          /*******color activation ****/
+          if (jempTone.color) {
+            dot.color = jempTone.color;
+          }
+
+          setInterval(() => {
+            //dot = false;
+          }, 1000);
           //play sound
           let t = this.getTones[jempTone.string - 1][jempTone.fret];
           this.sampler.triggerAttackRelease(t.tone, 0.6);
         }, jempTone.time);
-      }
+      });
     },
 
-    getLastTone(jempTones) {
-      let lastTone = jempTones[0];
-      //TODO make sure matching values get compared
-      for (let jempTone of jempTones) {
-        if (lastTone.time < jempTone.time) {
-          lastTone = jempTone;
-        }
-        //lastTone = jempTone ? lastTone.time < jempTone.time : lastTone;
-      }
+    /************manipulate active song***********/
+
+    setSongEndTime() {
+      this.endSongTime =
+        Tone.Transport.toSeconds(this.getLastTone().time) + this.endSongOffset;
+    },
+
+    getLastTone() {
+      let lastTone = this.activeSong.songdata[0];
+      this.activeSong.songdata.forEach((jempTone) => {
+        lastTone = lastTone.time < jempTone.time ? jempTone : lastTone;
+      });
       return lastTone;
     },
 
