@@ -12,6 +12,7 @@
   "dependencies": {
     "bootstrap-vue": "^2.16.0",
     "tone": "^14.7.39",
+    "vue-draggable-resizable": "^2.2.0",
     "vue-router": "^3.3.4",
     "vuetify": "^2.2.11",
     "vuex": "^3.5.1"

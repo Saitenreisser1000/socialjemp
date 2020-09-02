@@ -75,7 +75,7 @@ export default {
 
   watch: {
     speed: {
-      immediate: true,
+      immediate: false,
       handler() {
         Tone.Transport.bpm.value = this.speed;
         this.setSongEndTime();
@@ -89,7 +89,6 @@ export default {
     },
     jempSong: function () {
       this.scheduleSong(this.jempSong);
-      this.dottsInSong.forEach((dots) => (dots.isActive = false));
       this.reset();
     },
   },
@@ -122,7 +121,7 @@ export default {
       Tone.Transport.seconds = transPos / this.transMulti;
 
       //remove dots when fader is dragged towards left
-      this.activeSong.songdata.forEach((dot) => {
+      this.activeSong.songdata.tones.forEach((dot) => {
         if (Tone.Transport.toSeconds(dot.time) > Tone.Transport.seconds) {
           let higherDot = (this.dottsInSong.find(
             (d) => d.jt_ID === dot.dotID
@@ -140,26 +139,33 @@ export default {
       this.play();
     },
 
-    /******************Scheduling******************/
-
+    /**
+     * extracting and scheduling
+     * fetched activeSong is passed to this.activeSong to get access, extract and manipulate data 
+     */
     scheduleSong(activeSong) {
       //extract dot position from dot_ID ("5|3") => string = 5, fret = 3
-      activeSong.songdata.forEach((dot) => {
+      activeSong.songdata.tones.forEach((dot) => {
         dot.string = dot.dotID.match(/[^\|]*/)[0];
         dot.fret = dot.dotID.match(/[^|]*$/)[0];
       });
-      //prepare song for scheduler
       this.activeSong = activeSong;
       this.setSongEndTime();
+
+      //reset dots
+      this.dottsInSong.forEach((dots) => (dots.isActive = false));
       //find and store all needed dotts to activate them when played
-      this.activeSong.songdata.forEach((jempTone) => {
+      this.activeSong.songdata.tones.forEach((jempTone) => {
         let dot = this.allJemps.find((dot) => dot.jt_ID === jempTone.dotID);
         this.dottsInSong.push(dot);
       });
 
       //scheduling
       Tone.Transport.cancel();
-      this.activeSong.songdata.forEach((jempTone) => {
+      if(this.activeSong.songdata.bpm){
+        this.speed = this.activeSong.songdata.bpm;
+      }
+      this.activeSong.songdata.tones.forEach((jempTone) => {
         Tone.Transport.schedule(() => {
           //activate dot
           let dot = this.dottsInSong.find(
@@ -172,9 +178,11 @@ export default {
             dot.color = jempTone.color;
           }
 
+          /*doteffect after dot is set*/
           setInterval(() => {
             //dot = false;
           }, 1000);
+
           //play sound
           let t = this.getTones[jempTone.string - 1][jempTone.fret];
           this.sampler.triggerAttackRelease(t.tone, 0.6);
@@ -182,23 +190,25 @@ export default {
       });
     },
 
-    /************manipulate active song***********/
-
+    /**
+     * activeSong manipulation
+     */
     setSongEndTime() {
       this.endSongTime =
         Tone.Transport.toSeconds(this.getLastTone().time) + this.endSongOffset;
     },
 
     getLastTone() {
-      let lastTone = this.activeSong.songdata[0];
-      this.activeSong.songdata.forEach((jempTone) => {
+      let lastTone = this.activeSong.songdata.tones[0];
+      this.activeSong.songdata.tones.forEach((jempTone) => {
         lastTone = lastTone.time < jempTone.time ? jempTone : lastTone;
       });
       return lastTone;
     },
 
-    /****************Player ****************/
-
+    /**
+     * playersection
+     */
     playToggle(time) {
       if (
         Tone.Transport.state === "paused" ||

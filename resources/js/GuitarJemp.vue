@@ -1,6 +1,7 @@
 <template>
   <div>
     <fretboard></fretboard>
+    <sequencer></sequencer>
     <player></player>
     <songlist></songlist>
   </div>
@@ -12,9 +13,10 @@ import { mapGetters, mapActions } from "vuex";
 import fretboard from "./components/Fretboard/TheFretboard.vue";
 import songlist from "./components/SongList.vue";
 import player from "./components/Player.vue";
+import sequencer from "./components/Guitarroll/Sequencer.vue"
 
 export default {
-  components: { fretboard, songlist, player },
+  components: { fretboard, songlist, player, sequencer },
   data() {
     return {};
   },
