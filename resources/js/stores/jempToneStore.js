@@ -25,6 +25,7 @@ export const jempToneStore = {
         activeBoxContainer: [],
         openDotXPos: 20,
         defaultJempColor: 'indianred',
+        focusedDot: '',
 
         seqBoxes: {
             xPos: 0,
@@ -142,7 +143,8 @@ export const jempToneStore = {
             for (let i of state.jempToneContainer) {
                 i.isFocused = false;
             }
-            dot.isFocused = true
+            dot.isFocused = true;
+            state.focusedDot = dot;
         },
 
         changeBoxPos(state, box) {
@@ -162,6 +164,7 @@ export const jempToneStore = {
         getAllJemps: (state) => { return state.jempToneContainer },
         getActiveBoxes: (state) => { return state.activeBoxContainer },
         getOpenJempXPos: (state) => { return state.openDotXPos },
-        getTones: (state) => { return state.dotsPerString }
+        getTones: (state) => { return state.dotsPerString },
+        getFocusedDot: (state) => {return state.focusedDot}
     }
 };

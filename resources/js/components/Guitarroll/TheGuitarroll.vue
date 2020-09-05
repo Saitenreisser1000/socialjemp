@@ -1,6 +1,11 @@
 <template>
 <div class="container">
 <v-card id="seqContainer" :style="seqContainer">
+    <v-card class="multiDotDisplay">
+        <div class="mx-2" v-for="focusedDot in getFocusedDot.activeJemps" :key="focusedDot.dot_ID">
+            {{`string: ${getFocusedDot.string}, fret: ${getFocusedDot.fret}, time: ${focusedDot.time}`}}
+        </div>
+    </v-card>
     <v-card-text>
       <v-row
         align="center"
@@ -96,8 +101,7 @@
 
                 seqContainer: {
                     margin: '50px auto',
-                    padding: '20px',
-                    
+                    padding: '20px',                    
 
                     overflowX: 'auto',
                     backgroundColor: 'white',
@@ -107,7 +111,7 @@
 
                 boxWidth: 20,
                 instancePos: 0,
-                positionAdd: 40,
+                positionAdd: 20,
 
                 colWidth: 40,
             };
@@ -115,7 +119,7 @@
         },
 
         computed: {
-            ...mapGetters(['getActiveBoxes']),
+            ...mapGetters(['getActiveBoxes', 'getFocusedDot']),
         },
 
         methods: {
@@ -176,5 +180,10 @@
         border: 1px solid #0A2B4B;
         border-radius: 2px;
         position: relative;
+    }
+
+    .multiDotDisplay{
+        height: 100px;
+        overflow-y:auto;
     }
 </style>

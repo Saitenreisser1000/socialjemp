@@ -26,19 +26,18 @@ export default {
     onClick() {
       //no jemp
       if (this.isEditable) {
-        if (!this.dotInfo.isActive) {
+        //if (!this.dotInfo.isActive) {
           this.addActiveJemp();
           this.removeOthersFocus(this.dotInfo);
-          this.dotInfo.isActive = true;
-        }
+        //}
         //not focused anymore
-        else if (this.dotInfo.isFocused) {
-          this.dotInfo.isFocused = false;
-        }
+        //else if (this.dotInfo.isFocused) {
+          //this.dotInfo.isFocused = false;
+        //}
         //now focused this others unfocused - this has at least on active jemp
-        else {
-          this.removeOthersFocus(this.dotInfo);
-        }
+        //else {
+          //this.removeOthersFocus(this.dotInfo);
+        //}
       }
     },
     addActiveJemp() {
