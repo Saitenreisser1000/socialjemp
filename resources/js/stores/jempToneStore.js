@@ -1,7 +1,6 @@
 
 export const jempToneStore = {
     state: {
-
         dotsPerString: [],
 
         toneNames: [
@@ -29,7 +28,7 @@ export const jempToneStore = {
 
         seqBoxes: {
             xPos: 0,
-            xPosAdd: 40,
+            xPosAdd: 80,
             defaultWidth: 20,
         }
     },
@@ -106,7 +105,6 @@ export const jempToneStore = {
 
         addDot(state, jempTone) {
             let time = "0:" + (parseInt(state.seqBoxes.xPos / 40) + 1);
-
             let t = state.jempToneContainer.find(dot => dot.jt_ID === jempTone.jt_ID);
             /******addBox********/
             let newTone = {

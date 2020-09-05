@@ -3,10 +3,10 @@
     <div
       id="string"
       :style="{
-                    width: this.getFbData.fbWidth + 'px',
-                    top  : this.yPosition + 'px',
-                    height: this.getFbData.stringHeight + 'px',
-                    backgroundColor: this.getFbData.stringColor,
+                width: this.getFbData.fbWidth + 'px',
+                top  : this.yPosition + 'px',
+                height: this.getFbData.stringHeight + 'px',
+                backgroundColor: this.getFbData.stringColor,
              }"
     >
       <tone-dot
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import ToneDot from "./toneDot";
+import ToneDot from "./FretboardTonedot";
 import { mapGetters, mapActions } from "vuex";
 
 export default {

@@ -1,6 +1,58 @@
 <template>
 <div class="container">
-    <v-card id="seqContainer" :style="seqContainer">
+<v-card id="seqContainer" :style="seqContainer">
+    <v-card-text>
+      <v-row
+        align="center"
+        justify="center"
+      >
+        <v-btn-toggle
+          color="primary"
+          v-model="toneToggle"
+          mandatory
+        >
+          <v-btn value="1:0" text> 
+            <p>1</p>
+          </v-btn>
+          <v-btn value="0:2" text>
+            <p>1/2</p>
+          </v-btn>
+          <v-btn value="0:1" text>
+            <p>1/4</p>
+          </v-btn>
+          <v-btn value="0:0:2" text>
+            <p>1/8</p>
+          </v-btn>
+          <v-btn value="0:0:1" text>
+            <p>1/16</p>
+          </v-btn>
+        </v-btn-toggle>
+        <v-btn-toggle class="ml-2"
+            v-model="samePos"
+        >
+            <v-btn>
+                <p>samePos</p>
+            </v-btn>
+        </v-btn-toggle>
+        <v-btn-toggle class="ml-2"
+            v-model="punkt"
+        >
+            <v-btn>
+                <p>punktiert</p>
+            </v-btn>
+        </v-btn-toggle>
+        <v-btn-toggle class="ml-2"
+            v-model="triole"
+        >
+            <v-btn value="1">
+                <p>triole</p>
+            </v-btn>
+        </v-btn-toggle>
+      </v-row>
+    </v-card-text>
+    
+    <br>
+    
         <div id="outerFrame">
             <div id="seqFrame" :style="styleObject" :bind="width">
                 <Columns v-bind:key="n +'n'" v-for="n in 24" :height="240" :colWidth="colWidth"></Columns>
@@ -44,7 +96,7 @@
 
                 seqContainer: {
                     margin: '50px auto',
-                    padding: '40px',
+                    padding: '20px',
                     
 
                     overflowX: 'auto',

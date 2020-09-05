@@ -17,7 +17,7 @@ export default {
   props: ["dotInfo"],
   data() {
     return {
-      editable: false,
+      isEditable: true,
     };
   },
 
@@ -25,7 +25,7 @@ export default {
     ...mapActions(["addDot", "removeDot", "removeOthersFocus"]),
     onClick() {
       //no jemp
-      if (isEditable) {
+      if (this.isEditable) {
         if (!this.dotInfo.isActive) {
           this.addActiveJemp();
           this.removeOthersFocus(this.dotInfo);
